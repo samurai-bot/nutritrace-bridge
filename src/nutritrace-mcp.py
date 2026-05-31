@@ -6,7 +6,7 @@ Wraps NutriTrace REST API. No SSE complexity.
 import json
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.request import urlopen, Request
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 from datetime import datetime
 import os
 
@@ -56,7 +56,7 @@ def call_tool(name, args):
             return call_api("GET", f"/diary/range?from={args['from']}&to={args['to']}")
         elif name == "nutritrace_foods_search":
             limit = args.get("limit", 20)
-            return call_api("GET", f"/foods/search?q={args['q']}&limit={limit}")
+            return call_api("GET", f"/foods/search?q={quote(args['q'])}&limit={limit}")
         elif name == "nutritrace_foods_get":
             return call_api("GET", f"/foods/{args['id']}")
         elif name == "nutritrace_foods_categories":

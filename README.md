@@ -23,7 +23,7 @@ Single host, shared SQLite, zero pip dependencies:
 ├── nutritrace        (ghcr.io/traceapps/nutritrace)  :3000  UI
 ├── nutritrace-api    (python:3.11-alpine)             :3002  REST
 ├── nutritrace-mcp    (python:3.11-alpine)             :3003  MCP
-└── nutritrace.db                                      632+ foods
+└── nutritrace.db                                      718 foods
 ```
 
 8 n8n webhook workflows provide MCP access for Claude via the same pattern used by existing Strava and Scribble Wiki integrations.
@@ -95,7 +95,7 @@ python3 scripts/create-nutritrace-n8n.py
 
 ## Food Database
 
-632+ foods across 37 categories — Singapore-centric, continuously expanding:
+718 foods across 37 categories — Singapore-centric, continuously expanding:
 
 - Hawker: rice dishes, noodle soups, fried, snacks, hot and cold drinks
 - Japanese: ramen, sushi, donburi, katsu, tempura, sides
