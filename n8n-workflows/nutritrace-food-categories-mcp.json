@@ -1,0 +1,53 @@
+{
+  "name": "NutriTrace Food Categories - MCP",
+  "description": "List all 37 food categories in NutriTrace with item counts. Covers Hawker (Rice, Noodles, Fried, Snacks, Drinks), Japanese, Korean, Western, Indian, Thai, Vietnamese, Chinese/Zi Char, Fast Food, Bakery, Bubble Tea, Hot Pot, Seafood, Desserts.",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "nutritrace-food-categories",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://100.111.123.105:3002/foods/categories",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        200,
+        0
+      ],
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}

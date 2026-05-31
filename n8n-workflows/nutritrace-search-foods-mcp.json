@@ -1,0 +1,66 @@
+{
+  "name": "NutriTrace Search Foods - MCP",
+  "description": "Search NutriTrace food database by name, category, or brand. Returns foods with full nutrition info (calories, protein, carbs, fat, fiber, sodium) per serving. Use q=query&limit=N. Covers SG hawker, Japanese, Korean, Western, Indian, Thai, Vietnamese, fast food, bakery (632+ foods, 37 categories).",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "nutritrace-search-foods",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://100.111.123.105:3002/foods/search",
+        "options": {},
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{$json.query.q}}"
+            },
+            {
+              "name": "limit",
+              "value": "={{$json.query.limit || \"10\"}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        200,
+        0
+      ],
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}
