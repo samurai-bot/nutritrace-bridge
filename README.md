@@ -37,7 +37,7 @@ Single host, shared SQLite, zero pip dependencies:
 ├── scripts/
 │   ├── build-sg-food-db-v2.py   SG food database builder
 │   └── create-nutritrace-n8n.py n8n MCP webhook factory
-├── n8n-workflows/               8 exportable workflow JSONs
+├── n8n-workflows/               9 exportable workflow JSONs
 ├── config/
 │   ├── docker-compose.yml
 │   └── .env.example
