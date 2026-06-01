@@ -331,7 +331,7 @@ class APIHandler(BaseHTTPRequestHandler):
 
                 MEAL_MAP = {"breakfast": 0, "lunch": 1, "dinner": 2, "snacks": 3, "snack": 3}
                 meal_slot = MEAL_MAP.get(meal_name, 1)
-                now_ts = datetime.utcnow().isoformat()
+                now_ts = datetime.now().isoformat()
 
                 new_item = {
                     "id": food["id"],
@@ -400,7 +400,7 @@ class APIHandler(BaseHTTPRequestHandler):
                     (date_str,)
                 ).fetchone()
 
-                now = datetime.utcnow().isoformat()
+                now = datetime.now().isoformat()
                 if existing:
                     bs = json.loads(existing["body_stats"]) if existing["body_stats"] else {}
                     bs["weight"] = weight
@@ -433,7 +433,7 @@ class APIHandler(BaseHTTPRequestHandler):
                     return json_response(self, {"error": "name required"}, 400)
 
                 db = get_db()
-                now = datetime.utcnow().isoformat()
+                now = datetime.now().isoformat()
                 db.execute(
                     """INSERT INTO activity_log (user_id, date, name, kcal, duration_min, distance, source, created_at, updated_at)
                        VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?)""",

@@ -32,8 +32,8 @@ Single host, shared SQLite, zero pip dependencies:
 
 ```
 ├── src/
-│   ├── nutritrace-api.py        REST server (stdlib, ~500 lines)
-│   └── nutritrace-mcp.py        MCP JSON-RPC server (stdlib)
+│   ├── nutritrace-api.py        REST server (stdlib, 613 lines)
+│   └── nutritrace-mcp.py        MCP JSON-RPC server (stdlib, 168 lines)
 ├── scripts/
 │   ├── build-sg-food-db-v2.py   SG food database builder
 │   └── create-nutritrace-n8n.py n8n MCP webhook factory
@@ -128,6 +128,8 @@ python3 scripts/create-nutritrace-n8n.py
 - **Meal slots are numeric** — `0`=breakfast, `1`=lunch, `2`=dinner, `3`=snacks.
 - **`diary` table has no `created_at`** — only `updated_at`.
 - **Zero pip dependencies** — everything is Python stdlib.
+- **n8n `bodyParameters` serializes objects as JSON strings** — the MCP server deserializes string arguments via `json.loads()` guard before dispatching tools. Without this, activity endpoints fail with `TypeError: string indices must be integers`.
+- **Timezone** — all three containers run `TZ=Asia/Singapore`. The REST API uses `datetime.now()` (not `utcnow()`) so `created_at` timestamps are SGT. n8n instance timezone is also `Asia/Singapore`. Default-date fallbacks in MCP/API use `date.today()` which respects the container TZ.
 
 ## License
 
