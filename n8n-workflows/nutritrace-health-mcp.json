@@ -101,5 +101,6 @@
     "executionOrder": "v1",
     "availableInMCP": true,
     "callerPolicy": "workflowsFromSameOwner"
-  }
+  },
+  "description": "Check NutriTrace API + MCP server health status"
 }

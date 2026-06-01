@@ -101,5 +101,6 @@
     "executionOrder": "v1",
     "availableInMCP": true,
     "callerPolicy": "workflowsFromSameOwner"
-  }
+  },
+  "description": "Get daily activity calorie summary (manual + wearable)"
 }

@@ -101,5 +101,6 @@
     "executionOrder": "v1",
     "availableInMCP": true,
     "callerPolicy": "workflowsFromSameOwner"
-  }
+  },
+  "description": "Log a manual activity/workout (name, kcal, duration, distance)"
 }

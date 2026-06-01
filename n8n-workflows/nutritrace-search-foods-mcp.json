@@ -1,6 +1,6 @@
 {
   "name": "NutriTrace Search Foods - MCP",
-  "description": "Search NutriTrace food database by name, category, or brand. Returns foods with full nutrition info (calories, protein, carbs, fat, fiber, sodium) per serving. Use q=query&limit=N. Covers SG hawker, Japanese, Korean, Western, Indian, Thai, Vietnamese, fast food, bakery (632+ foods, 37 categories).",
+  "description": "Search NutriTrace food database by name, category, or brand. Returns foods with full nutrition info (calories, protein, carbs, fat, fiber, sodium) per serving. Use q=query&limit=N. Covers SG hawker, Japanese, Korean, Western, Indian, Thai, Vietnamese, fast food, bakery (718 foods, 37 categories).",
   "nodes": [
     {
       "parameters": {

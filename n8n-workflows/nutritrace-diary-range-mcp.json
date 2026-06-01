@@ -101,5 +101,6 @@
     "executionOrder": "v1",
     "availableInMCP": true,
     "callerPolicy": "workflowsFromSameOwner"
-  }
+  },
+  "description": "Get diary entries for a date range (from/to)"
 }
