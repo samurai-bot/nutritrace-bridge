@@ -25,6 +25,9 @@ TOOLS = [
     {"name":"nutritrace_foods_add","description":"Add food to database","inputSchema":{"type":"object","properties":{"name":{"type":"string"},"nutrition":{"type":"object"},"portion":{"type":"number"},"unit":{"type":"string"},"category":{"type":"string"},"brand":{"type":"string"},"notes":{"type":"string"},"barcode":{"type":"string"}},"required":["name","nutrition"]}},
     {"name":"nutritrace_stats_daily","description":"Daily nutrition summary","inputSchema":{"type":"object","properties":{"date":{"type":"string"}},"required":[]}},
     {"name":"nutritrace_stats_weekly","description":"7-day nutrition averages","inputSchema":{"type":"object","properties":{},"required":[]}},
+    {"name":"nutritrace_activity_get","description":"Get logged activities for a date","inputSchema":{"type":"object","properties":{"date":{"type":"string"}},"required":["date"]}},
+    {"name":"nutritrace_activity_sum","description":"Get daily activity calorie summary (manual + wearable)","inputSchema":{"type":"object","properties":{"date":{"type":"string"}},"required":[]}},
+    {"name":"nutritrace_activity_log","description":"Log a manual activity/workout","inputSchema":{"type":"object","properties":{"date":{"type":"string"},"name":{"type":"string"},"kcal":{"type":"integer"},"duration_min":{"type":"integer"},"distance":{"type":"string"}},"required":["date","name","kcal"]}}
 ]
 
 
@@ -68,6 +71,20 @@ def call_tool(name, args):
             return call_api("GET", f"/stats/daily?date={date}")
         elif name == "nutritrace_stats_weekly":
             return call_api("GET", "/stats/weekly")
+
+        elif name == "nutritrace_activity_get":
+            return call_api("GET", f"/activity/{args['date']}")
+        elif name == "nutritrace_activity_sum":
+            date = args.get("date", datetime.now().strftime("%Y-%m-%d"))
+            return call_api("GET", f"/activity/sum/{date}")
+        elif name == "nutritrace_activity_log":
+            return call_api("POST", "/activity/log", {
+                "name": args["name"],
+                "date": args.get("date", datetime.now().strftime("%Y-%m-%d")),
+                "kcal": args["kcal"],
+                "duration_min": args.get("duration_min"),
+                "distance": args.get("distance", "")
+            })
         else:
             return {"error": f"Unknown tool: {name}"}
     except Exception as e:

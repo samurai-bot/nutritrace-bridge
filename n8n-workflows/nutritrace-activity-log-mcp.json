@@ -1,0 +1,105 @@
+{
+  "name": "NutriTrace Activity Log",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nutritrace-activity-log",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "name": "Webhook",
+      "id": "2804c0d1-ee92-4a94-bf33-f10dd8ca6cc0",
+      "webhookId": "52c070ef-b139-4aca-9e41-7a03e0c29927"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://100.111.123.105:3003/mcp",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "jsonrpc",
+              "value": "2.0"
+            },
+            {
+              "name": "id",
+              "value": "1"
+            },
+            {
+              "name": "method",
+              "value": "tools/call"
+            },
+            {
+              "name": "params.name",
+              "value": "nutritrace_activity_log"
+            },
+            {
+              "name": "params.arguments",
+              "value": "={{ JSON.stringify({date: $json.body.date, name: $json.body.name, kcal: Number($json.body.kcal), duration_min: $json.body.duration_min ? Number($json.body.duration_min) : undefined, distance: $json.body.distance ? Number($json.body.distance) : undefined}) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        250,
+        0
+      ],
+      "name": "HTTP Request",
+      "id": "02af1768-01e5-4070-baeb-a86b3b18316c"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Unwrap MCP JSON-RPC response\nconst body = $input.first().json;\nif (body.error) {\n  throw new Error(body.error.message || 'MCP error');\n}\nconst text = body.result.content[0].text;\nconst parsed = JSON.parse(text);\nreturn parsed;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        0
+      ],
+      "name": "Unwrap MCP Response",
+      "id": "fa3963dd-d2eb-4da3-ba99-df0ae94befd2"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Unwrap MCP Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}

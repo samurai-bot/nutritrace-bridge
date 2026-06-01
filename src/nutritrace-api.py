@@ -75,6 +75,42 @@ class APIHandler(BaseHTTPRequestHandler):
                 db.close()
                 return json_response(self, {"status": "ok", "db": "connected"})
 
+
+            # ── ACTIVITY ──
+            elif path.startswith("/activity/sum/"):
+                date_str = path.split("/activity/sum/")[1]
+                db = get_db()
+                manual_row = db.execute(
+                    "SELECT COALESCE(SUM(kcal), 0) AS s FROM activity_log WHERE user_id=1 AND date=? AND deleted_at IS NULL",
+                    (date_str,)
+                ).fetchone()
+                wearable_row = db.execute(
+                    "SELECT MAX(value) AS v FROM wellness_data WHERE user_id=1 AND date=? AND metric_type='active_calories'",
+                    (date_str,)
+                ).fetchone()
+                db.close()
+                manual = int(manual_row["s"] or 0)
+                wearable = int(wearable_row["v"] or 0)
+                effective = max(manual, wearable)
+                return json_response(self, {
+                    "date": date_str,
+                    "manual": manual,
+                    "wearable": wearable,
+                    "effective": effective
+                })
+
+            elif path.startswith("/activity/"):
+                date_str = path.split("/activity/")[1]
+                db = get_db()
+                rows = db.execute(
+                    """SELECT id, date, name, kcal, duration_min, distance, source, created_at
+                       FROM activity_log WHERE user_id=1 AND date=? AND deleted_at IS NULL
+                       ORDER BY id ASC""",
+                    (date_str,)
+                ).fetchall()
+                db.close()
+                return json_response(self, [dict(r) for r in rows])
+
             # ── WEIGHT ──
             elif path == "/weight/history":
                 db = get_db()
@@ -207,11 +243,30 @@ class APIHandler(BaseHTTPRequestHandler):
                 ).fetchone()
                 db.close()
                 if not row:
-                    return json_response(self, {"date": date_str, "meals": {}, "totals": {
+                    empty_summary = {"date": date_str, "meals": {}, "totals": {
                         "calories": 0, "protein": 0, "carbs": 0, "fat": 0,
                         "fiber": 0, "sodium": 0, "water_ml": 0
-                    }})
-                return json_response(self, _compute_daily_summary(row))
+                    }}
+                    act_row = get_db().execute(
+                        "SELECT COALESCE(SUM(kcal), 0) AS s FROM activity_log WHERE user_id=1 AND date=? AND deleted_at IS NULL",
+                        (date_str,)
+                    ).fetchone()
+                    empty_summary["activity_kcal"] = int(act_row["s"] or 0)
+                    empty_summary["net_kcal"] = 0 - empty_summary["activity_kcal"]
+                    return json_response(self, empty_summary)
+                summary = _compute_daily_summary(row)
+                # Add activity calories for net deficit
+                act_row = get_db().execute(
+                    "SELECT COALESCE(SUM(kcal), 0) AS s FROM activity_log WHERE user_id=1 AND date=? AND deleted_at IS NULL",
+                    (date_str,)
+                ).fetchone()
+                wear_row = get_db().execute(
+                    "SELECT MAX(value) AS v FROM wellness_data WHERE user_id=1 AND date=? AND metric_type='active_calories'",
+                    (date_str,)
+                ).fetchone()
+                summary["activity_kcal"] = max(int(act_row["s"] or 0), int(wear_row["v"] or 0))
+                summary["net_kcal"] = summary["totals"]["calories"] - summary["activity_kcal"]
+                return json_response(self, summary)
 
             elif path == "/stats/weekly":
                 end = date.today()
@@ -364,6 +419,30 @@ class APIHandler(BaseHTTPRequestHandler):
                 db.commit()
                 db.close()
                 return json_response(self, {"ok": True, "date": date_str, "weight": weight, "unit": unit})
+            elif path == "/activity/log":
+                body = parse_body(self)
+                name = str(body.get("name", "")).strip()[:80]
+                date_str = body.get("date", date.today().isoformat())
+                kcal = max(0, int(body.get("kcal", 0)))
+                duration_min = body.get("duration_min")
+                distance = str(body.get("distance", ""))[:40] or None
+                source = body.get("source", "manual_form")
+                if source not in ("manual_form", "ai_estimated", "user_stated"):
+                    source = "manual_form"
+                if not name:
+                    return json_response(self, {"error": "name required"}, 400)
+
+                db = get_db()
+                now = datetime.utcnow().isoformat()
+                db.execute(
+                    """INSERT INTO activity_log (user_id, date, name, kcal, duration_min, distance, source, created_at, updated_at)
+                       VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (date_str, name, kcal, duration_min, distance, source, now, now)
+                )
+                db.commit()
+                row = db.execute("SELECT * FROM activity_log WHERE id = last_insert_rowid()").fetchone()
+                db.close()
+                return json_response(self, dict(row), 201)
 
             else:
                 return json_response(self, {"error": "not found"}, 404)

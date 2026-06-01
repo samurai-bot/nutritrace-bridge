@@ -1,0 +1,105 @@
+{
+  "name": "NutriTrace Activity Get",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "nutritrace-activity-get",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "name": "Webhook",
+      "id": "fc75b4bf-959f-4649-8017-100e4d2c3a56",
+      "webhookId": "14255ab6-19aa-4ca4-ad36-fcb836ac9235"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://100.111.123.105:3003/mcp",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "jsonrpc",
+              "value": "2.0"
+            },
+            {
+              "name": "id",
+              "value": "1"
+            },
+            {
+              "name": "method",
+              "value": "tools/call"
+            },
+            {
+              "name": "params.name",
+              "value": "nutritrace_activity_get"
+            },
+            {
+              "name": "params.arguments",
+              "value": "={{ JSON.stringify({date: $json.query.date}) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        250,
+        0
+      ],
+      "name": "HTTP Request",
+      "id": "33473094-c59b-4062-a391-ac43bb406a57"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Unwrap MCP JSON-RPC response\nconst body = $input.first().json;\nif (body.error) {\n  throw new Error(body.error.message || 'MCP error');\n}\nconst text = body.result.content[0].text;\nconst parsed = JSON.parse(text);\nreturn parsed;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        0
+      ],
+      "name": "Unwrap MCP Response",
+      "id": "53b930d4-81fa-4085-833f-3816e137ca03"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Unwrap MCP Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}
