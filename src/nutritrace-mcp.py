@@ -130,7 +130,10 @@ class MCPHandler(BaseHTTPRequestHandler):
             elif method == "tools/list":
                 result = {"tools": TOOLS}
             elif method == "tools/call":
-                tool_result = call_tool(params.get("name"), params.get("arguments", {}))
+                arguments = params.get("arguments", {})
+                if isinstance(arguments, str):
+                    arguments = json.loads(arguments)
+                tool_result = call_tool(params.get("name"), arguments)
                 result = {"content": [{"type": "text", "text": json.dumps(tool_result, ensure_ascii=False)}]}
             elif method == "notifications/initialized":
                 return None
