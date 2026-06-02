@@ -27,7 +27,7 @@
           "parameters": [
             {
               "name": "date",
-              "value": "={{$json.query.date || $now.format(\"YYYY-MM-DD\")}}"
+              "value": "={{$json.query.date || $now.format(\"yyyy-MM-dd\")}}"
             }
           ]
         }

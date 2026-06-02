@@ -44,7 +44,7 @@
             },
             {
               "name": "params.arguments",
-              "value": "={{ JSON.stringify({date: ($json.query && $json.query.date) || $now.format(\"YYYY-MM-DD\")}) }}"
+              "value": "={{ JSON.stringify({date: ($json.query && $json.query.date) || $now.format(\"yyyy-MM-dd\")}) }}"
             }
           ]
         },

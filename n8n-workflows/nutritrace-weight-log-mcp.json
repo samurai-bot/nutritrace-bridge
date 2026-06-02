@@ -30,7 +30,7 @@
             },
             {
               "name": "date",
-              "value": "={{ $json.body.date || $now.format(\"YYYY-MM-DD\") }}"
+              "value": "={{ $json.body.date || $now.format(\"yyyy-MM-dd\") }}"
             },
             {
               "name": "unit",
