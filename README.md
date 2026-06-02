@@ -130,6 +130,7 @@ python3 scripts/create-nutritrace-n8n.py
 - **Zero pip dependencies** — everything is Python stdlib.
 - **n8n `bodyParameters` serializes objects as JSON strings** — the MCP server deserializes string arguments via `json.loads()` guard before dispatching tools. Without this, activity endpoints fail with `TypeError: string indices must be integers`.
 - **Timezone** — all three containers run `TZ=Asia/Singapore`. The REST API uses `datetime.now()` (not `utcnow()`) so `created_at` timestamps are SGT. n8n instance timezone is also `Asia/Singapore`. Default-date fallbacks in MCP/API use `date.today()` which respects the container TZ.
+- **n8n `$now.format()` uses Luxon, not moment/strftime** — `$now.format("YYYY-MM-DD")` evaluates to literal `YYYY-06-Jun 3, 2026` because `YYYY` isn't a Luxon token (passes through literally) and `DD` is a localized-date macro. Always use `yyyy-MM-dd` in n8n expressions. This was fixed in v1.1.1.
 
 ## License
 
